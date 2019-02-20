@@ -1,0 +1,19 @@
+{
+  "name": "kl-autoshot",
+  "version": "0.0.0",
+  "description": "Automated screenshot tool for KLY websites",
+  "main": "index.js",
+  "scripts": {
+    "bundle": "pkg -t node10-linux-x64 package.json",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": "index.js",
+  "author": "Krisnata Panji",
+  "license": "ISC",
+  "dependencies": {
+    "carlo": "^0.9.43",
+    "puppeteer-core": "^1.12.2",
+    "request": "^2.88.0"
+  }
+}

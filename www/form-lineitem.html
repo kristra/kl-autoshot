@@ -1,0 +1,52 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./assets/bootstrap.min.css">
+    <title>KL Autoshot</title>
+  </head>
+  <body class="d-flex flex-column h-100" onload="load()">
+    <main class="flex-shrink-0">
+      <div class="container">
+        <form>
+          <div class="form-group">
+              <input type="text" name="lineItem" id="lineItem" class="form-control" oninput="check(this.value)" placeholder="https://www.google.com/dfp/36504930#delivery/LineItemDetail/&lineItemId=xxxxxxxxxx" required>
+          </div>
+          <button class="btn btn-dark" id="submit">Screenshot</button>
+        </form>
+      </div>
+    </main>
+    <footer class="footer mt-auto py-2" style="background-color: #f5f5f5;">
+      <div class="container">
+        <h6 class="text-muted text-center">made by Krisnata</h6>
+      </div>
+    </footer>
+  </body>
+  <script>
+    
+    async function load(){
+      const [backend] = await carlo.loadParams();
+      const submit = document.getElementById('submit');
+      submit.onclick = async function(){
+        const json = await backend.lineItemShot(4963016537, null, null, null);
+        console.log(json);
+      }
+    }
+    
+    // form validation
+    function check(val){
+      const input = document.getElementById('lineItem');
+      const submit = document.getElementById('submit');
+      if((val.search(/lineitemid=(\d{10})/gi) > -1) || (val.search(/^\d{10}/) > -1) ){
+        input.classList.add('is-valid');
+        input.classList.remove('is-invalid');
+        submit.disabled = false;
+      } else {
+        input.classList.remove('is-valid');
+        input.classList.add('is-invalid');
+        submit.disabled = true;
+      }
+    }
+  </script>
+</html>
