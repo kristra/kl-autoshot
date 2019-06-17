@@ -8,6 +8,9 @@
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "pkg" : {
+    "assets" : "./www/**"
+  },
   "bin": "index.js",
   "author": "Krisnata Panji",
   "license": "ISC",
