@@ -11,7 +11,7 @@ module.exports = class Backend{
     this.windows_ = new Map();
   }
 
-  async getPreviewUrl(lineItemId){
+  getPreviewUrl(lineItemId){
     return new Promise(function(resolve, reject){
       const url = 'http://192.168.0.252/dfpapi/ci3/lineitem/preview/' + lineItemId;
       request.get(url, {json: true}, function(error, response, body){    
@@ -30,11 +30,10 @@ module.exports = class Backend{
     try {
       const previews = [];
       const json = await this.getPreviewUrl(obj.lineItemId);
-      json.forEach(function(val){
-        for(let idx = 0; idx < obj.sites.length; idx++){
-          const url = obj.sites[idx] + /(\?google_preview\S*)/.exec(val.previewUrl)[0];
-          console.log(/(\?google_preview\S*)/.exec(val.previewUrl)[0]);
-          const filename = val.creativeName.replace(/\W/g, '_') + '_' + obj.sites[idx] + '_' + val.size;
+      json.forEach((val) => {
+        obj.sites.forEach((site) => {
+          const url = site + /(\?google_preview\S*)/.exec(val.previewUrl)[0];
+          const filename = val.creativeName.replace(/\W/g, '_') + '_' + site + '_' + val.size;
           if(obj.device === 'desktop' || obj.device === 'mobile') {
             previews.push({ url : url, device : obj.device, filename : filename + '_' + obj.device } );
           } else {
@@ -47,10 +46,10 @@ module.exports = class Backend{
               previews.push({ url : url, device : 'desktop', filename : filename + '_desktop' });
             }
           }
-        }
+        })
       });
-      await Promise.all(previews);
-      await screenshot.initBatch(previews, obj);
+      const result = await screenshot.initBatch(previews, obj);
+      return result;
     } catch (error) {
       return false;
     }

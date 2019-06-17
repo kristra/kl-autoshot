@@ -28,6 +28,16 @@ async function load(){
       if(report){
         pepe.style.display = 'none';
         success.style.display = 'block';
+        if( typeof report === 'object') {
+          report.forEach(elem => {
+            success.appendChild(htmlToElement(`
+              <p style='border-style: solid; border-width:1px 0 0 0;padding-top: 1em;'>filaname: ${elem.preview.filename}</p>
+              <p>device: ${elem.preview.device}</p>
+              <p>url: ${elem.preview.url}</p>
+              <p style='border-style: solid; border-width:0 0 1px 0;padding-bottom: 1em;'>error: ${elem.error}</p>
+            `));
+          });
+        }
       } else {
         pepe.style.display = 'none';
         fail.style.display = 'block';
@@ -76,4 +86,11 @@ function initCombobox(containter, site){
   label.appendChild(checkbox);
   label.appendChild(document.createTextNode(site));
   document.getElementById(containter).appendChild(label);
+}
+
+function htmlToElement(html) {
+  var template = document.createElement('template');
+  html = html.trim();
+  template.innerHTML = html;
+  return template.content;
 }

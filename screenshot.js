@@ -2,30 +2,28 @@ const puppeteer = require('puppeteer-core');
 const findChrome = require('carlo/lib/find_chrome');
 const hrstart = process.hrtime();
 
-async function screenshot(page, preview, options, filter){
+async function screenshot(page, preview, options, filter, callback){
   if (preview.device === 'mobile' && !preview.url.match(/^https:\/\/m./g)) {
     preview.url = 'https://m.' + preview.url;
   } else if (preview.device === 'desktop' && !preview.url.match(/^https:\/\//g)) {
     preview.url = 'https://' + preview.url;
   }
   console.log('Processing: ', preview.filename, preview.url);
-  return new Promise(async function(resolve, reject){
-    try {
-      await page.goto(preview.url, {waitUntil: 'networkidle0', timeout: options.timeout});
-      await page.waitForSelector('[data-google-query-id]', {timeout: 500});
-      await page.hover('[data-google-query-id=""]');
-      await page.hover('[data-google-query-id=""]');
-      await page.screenshot({path: preview.filename + '.png'});
-      return resolve('success');
-    } catch (error) {
-      console.log(error.name, error.message);
-      if (error instanceof puppeteer.errors.TimeoutError) { 
-        await screenshot(page, preview, options, filter) 
-      } else {
-        return reject(error);
-      };
-    }
-  });
+  try {
+    await page.goto(preview.url, {waitUntil: 'networkidle0', timeout: options.timeout});
+    await page.waitForSelector('[data-google-query-id]', {timeout: 500});
+    await page.hover('[data-google-query-id=""]');
+    await page.hover('[data-google-query-id=""]');
+    await page.screenshot({path: 'screenshot/' + preview.filename + options.ext});
+    callback(true);
+  } catch (error) {
+    // console.log(error.name, error.message);
+    if (error instanceof puppeteer.errors.TimeoutError) { 
+      await screenshot(page, preview, options, filter, callback);
+    } else {
+      callback({preview : preview, error : error.message});
+    };
+  }
 }
 
 async function initBatch (previews, options){
@@ -44,19 +42,19 @@ async function initBatch (previews, options){
         const page = await browser.newPage();
         if (previews[idx].device === 'desktop') {
           await page.setViewport({width: 1366, height: 650});
-          promises.push(screenshot(page, previews[idx], options, null));
+          promises.push(screenshot(page, previews[idx], options, null, (preview)=>{failed.push(preview)}));
         } else {
-          await page.emulate(puppeteer.devices['iPhone 6']);
-          promises.push(screenshot(page, previews[idx], options, null));
+          await page.emulate(puppeteer.devices['iPhone 8']);
+          promises.push(screenshot(page, previews[idx], options, null, (preview)=>{failed.push(preview)}));
         }
       }
     }
-    const end = await Promise.all(promises);
+    await Promise.all(promises);
     await browser.close();
-    console.log(end);
     const hrend = process.hrtime(hrstart);
-    console.log('Execution time (hr): %ds', hrend[0]);
+    console.log('Execution time (hr): %ds', hrend[0]);    
   }
+  return failed;
 }
 
 module.exports = { initBatch, screenshot };
