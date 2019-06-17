@@ -1,8 +1,8 @@
 'use strict';
 
 const carlo = require('carlo');
-const jsonAPI = require('./api');
-const batch = require('./batch');
+const request = require('request');
+const screenshot = require('./screenshot');
 
 module.exports = class Backend{
 
@@ -10,23 +10,49 @@ module.exports = class Backend{
     this.app_ = app;
     this.windows_ = new Map();
   }
-  
-  async lineItemShot(lineItemId, sites, devices, parallel){
-    const json = await jsonAPI(lineItemId);
-    const urls = [];
-    json.forEach(function(val){
-      for(let i = 0; i < sites.length; i++){
-        const regex = /(\?google_preview\S*)/;
-        urls.push({
-          url : sites[i] + regex.exec(val.previewUrl),
-          filename : sites[i] + val.creativeId
-        });
-      }
+
+  async getPreviewUrl(lineItemId){
+    return new Promise(function(resolve, reject){
+      const url = 'http://192.168.0.252/dfpapi/ci3/lineitem/preview/' + lineItemId;
+      request.get(url, {json: true}, function(error, response, body){    
+        if(error){
+          reject(error);
+        } else {
+          resolve(body);
+        }
+      });
     });
-
-    Promise.all(urls);
-    console.log(urls);
-
-    return json;
+  }
+  
+  async batchScreenshot(formData){
+    const obj = JSON.parse(formData);
+    console.log('Starting... ', obj.lineItemId, obj.sites);
+    try {
+      const previews = [];
+      const json = await this.getPreviewUrl(obj.lineItemId);
+      json.forEach(function(val){
+        for(let idx = 0; idx < obj.sites.length; idx++){
+          const url = obj.sites[idx] + /(\?google_preview\S*)/.exec(val.previewUrl)[0];
+          console.log(/(\?google_preview\S*)/.exec(val.previewUrl)[0]);
+          const filename = val.creativeName.replace(/\W/g, '_') + '_' + obj.sites[idx] + '_' + val.size;
+          if(obj.device === 'desktop' || obj.device === 'mobile') {
+            previews.push({ url : url, device : obj.device, filename : filename + '_' + obj.device } );
+          } else {
+            if (val.size.match(/(320x50)|(320x100)/g)){
+              previews.push({ url : url, device : 'mobile', filename : filename + '_mobile' });
+            } else if(val.size.match(/(970x90)|(728x90)|(300x600)/g)){
+              previews.push({ url : url, device : 'desktop', filename : filename + '_desktop' });
+            } else {
+              previews.push({ url : url, device : 'mobile', filename : filename + '_mobile' });
+              previews.push({ url : url, device : 'desktop', filename : filename + '_desktop' });
+            }
+          }
+        }
+      });
+      await Promise.all(previews);
+      await screenshot.initBatch(previews, obj);
+    } catch (error) {
+      return false;
+    }
   }
 }

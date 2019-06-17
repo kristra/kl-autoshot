@@ -1,63 +1,72 @@
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="./assets/bootstrap.min.css">
-    <title>KL Autoshot</title>
-  </head>
-  <body class="d-flex flex-column h-100" onload="dogPicture()">
-    <main class="flex-shrink-0">
-      <div class="container">
-        <h1 class="text-center border-bottom">Henlo Fren</h1>
-        <div class="card-columns">
-          <div class="card">
-            <img id="dog0" class="card-img-top" style="max-height: 256px" src="./assets/load.gif" alt="Menu 1">
-            <div class="card-body">
-              <h5 class="card-title">Line Item</h5>
-              <a href="./form-lineitem.html" class="btn btn-dark">Go somewhere</a>
-            </div>
-          </div>
-          <div class="card">
-            <img id="dog1" class="card-img-top" style="max-height: 256px" src="./assets/load.gif" alt="Menu 1">
-            <div class="card-body">
-              <h5 class="card-title">Preview URL</h5>
-              <a href="./form-preview.html" class="btn btn-dark">Go somewhere</a>
-            </div>
-          </div>
-          <div class="card">
-            <img id="dog2" class="card-img-top" style="max-height: 256px" src="./assets/load.gif" alt="Menu 1">
-            <div class="card-body">
-              <h5 class="card-title">Settings</h5>            
-              <a href="./settings.html" class="btn btn-dark">Go somewhere</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-    <footer class="footer mt-auto py-2" style="background-color: #f5f5f5;">
-      <div class="container">
-        <h6 class="text-muted text-center">made by Krisnata</h6>
-      </div>
-    </footer>
-  </body>
-  <script>
-    async function load(){
-      dogPicture();
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="./assets/pure/base-min.css">
+  <link rel="stylesheet" href="./assets/pure/grids-min.css">
+  <link rel="stylesheet" href="./assets/pure/grids-responsive-min.css">
+  <title>KL Autoshot</title>
+  <style>
+    body {
+      margin: auto 5%;
     }
-    function dogPicture() {
-      const xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          JSON.parse(this.responseText).message.forEach(function(val, idx){
-            const id = 'dog'+idx;
-            console.log(id, val);
-            document.getElementById(id).src = val;
-          });
-        }
-      };
-      xhttp.open('GET', 'https://dog.ceo/api/breed/shiba/images/random/3', true);
-      xhttp.send();
+    p, img, h1 {
+      vertical-align: middle;
+      text-align: center;
+      margin: auto;
     }
-  </script>
+    #dog {
+      max-height: 400px;
+    }
+    #status {
+      height: 12px;
+    }
+  </style>
+</head>
+<body onload="load()">
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <h1 id="msg">Henlo Frens</h1>
+    </div>
+    <div class="pure-u-1">
+      <a id="link" href="" ><img id="dog" class="pure-img" src="./assets/load.gif" alt="Dog"></a>
+    </div>
+    <div class="pure-u-1">
+      <p>Dolphin API: <img id="status" src="./assets/load.gif" alt="Status"> </p>
+    </div>
+  </div>
+</body>
+<script>
+  async function load(){
+    fetchDog();
+    dolphinAPI();
+  }
+  function fetchDog() {
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById('dog').src = JSON.parse(this.responseText).message;
+      }
+    };
+    xhttp.open('GET', 'https://dog.ceo/api/breed/shiba/images/random', true);
+    xhttp.send();
+  }
+  function dolphinAPI(){
+    const xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      console.log(this);
+      if (this.readyState == 4 && this.status == 200) {
+        document.getElementById('status').src = './assets/checked.png';
+        document.getElementById('msg').innerText = 'Henlo Frens \n\nClick doge to continue'
+        document.getElementById('link').href = './form-lineitem.html';
+      } else {
+        document.getElementById('status').src = './assets/cancel.png';
+        document.getElementById('msg').innerText = 'Henlo Frens \n\nPlz use KLY Connection\nClick doge to refresh'
+      }
+    };
+    xhttp.open('GET', 'http://192.168.0.252/dfpapi/ci3/lineitem/preview/', true);
+    xhttp.send();
+  }
+</script>
 </html>
