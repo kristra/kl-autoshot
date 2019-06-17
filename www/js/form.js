@@ -15,6 +15,10 @@ async function load(){
       let obj = {};
       const sites = [];
       document.querySelectorAll('input[type=text], input[type=number], input[type=radio]:checked').forEach(function(element){
+        if((element.name === 'lineItemId') && (element.value.search(/lineitemid=(\d{10})/gi) > -1)) {
+          console.log (element.value);
+          element.value = /\d{10}/g.exec(element.value.match(/lineitemid=(\d{10})/gi)[0]);
+        }
         obj [element.name] = element.value;
       });
       document.querySelectorAll('input[type=checkbox]:checked').forEach(function(site){
@@ -28,16 +32,14 @@ async function load(){
       if(report){
         pepe.style.display = 'none';
         success.style.display = 'block';
-        if( typeof report === 'object') {
-          report.forEach(elem => {
-            success.appendChild(htmlToElement(`
-              <p style='border-style: solid; border-width:1px 0 0 0;padding-top: 1em;'>filaname: ${elem.preview.filename}</p>
-              <p>device: ${elem.preview.device}</p>
-              <p>url: ${elem.preview.url}</p>
-              <p style='border-style: solid; border-width:0 0 1px 0;padding-bottom: 1em;'>error: ${elem.error}</p>
-            `));
-          });
-        }
+        report.forEach(elem => {
+          success.appendChild(htmlToElement(`
+            <p style='border-style: solid; border-width:1px 0 0 0;padding-top: 1em;'>filaname: ${elem.preview.filename}</p>
+            <p>device: ${elem.preview.device}</p>
+            <p>url: ${elem.preview.url}</p>
+            <p style='border-style: solid; border-width:0 0 1px 0;padding-bottom: 1em;'>error: ${elem.error}</p>
+          `));
+        });
       } else {
         pepe.style.display = 'none';
         fail.style.display = 'block';

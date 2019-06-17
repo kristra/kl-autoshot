@@ -35,7 +35,7 @@ async function initBatch (previews, options){
   for(let i = 0; i < previews.length; i += parseInt(options.parallel)){
     batch++;
     console.log('Processing ' + batch + ' of ' + batchCount);
-    const browser = await puppeteer.launch({executablePath: pathToChrome.executablePath, args: ['--disable-web-security','--allow-running-insecure-content'], userDataDir: '/tmp'});
+    const browser = await puppeteer.launch({executablePath: pathToChrome.executablePath, args: ['--disable-web-security','--allow-running-insecure-content'], userDataDir: './tmp'});
     const promises = [];
     for(let j = 0; j < options.parallel; j++){
       const idx = i + j;
