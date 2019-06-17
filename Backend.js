@@ -1,6 +1,6 @@
 'use strict';
 
-const carlo = require('carlo');
+const fs = require('fs');
 const request = require('request');
 const screenshot = require('./screenshot');
 
@@ -9,6 +9,11 @@ module.exports = class Backend{
   constructor(app){
     this.app_ = app;
     this.windows_ = new Map();
+    fs.stat('./screenshot', (err, stat) => {
+      if(err){
+        fs.mkdir('./screenshot', err => {console.log(err)});
+      }
+    });
   }
 
   getPreviewUrl(lineItemId){
