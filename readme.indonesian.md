@@ -48,7 +48,7 @@
 
 ![alt text](https://cdn.betterttv.net/emote/5803757f3d506fea7ee35267/3x "FeelsOkayMan")
   
-  - Screenshot yang gagal akan di tambilkan beserta pesan errornya.
+  - Screenshot yang gagal akan di tampilkan beserta pesan errornya.
 
   > Jika pesan errornya seperti yang berikut, artinya materinya tidak ditemukan. Misalnya saat screenshot materi desktop, tapi device diset mobile.
 
