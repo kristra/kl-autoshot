@@ -2,7 +2,7 @@
 
 #### Cara kerja
 - Aplikasi ini menjalankan chrome secara 'headless' atau tanpa interface di background.
-- Screenshot di dapat dari semua creative yang berstatus aktif.
+- Screenshot didapat dari semua creative yang berstatus aktif.
 
 #### Kebutuhan
 - Google Chrome stable
@@ -11,7 +11,7 @@
 #### Panduan
 1. LineItemID
 
-    ID Line item Google Ad Manager, isian yang valid dapat dicek dibawah.
+    ID Line item Google Ad Manager, contoh isian yang benar:
 
     - https://admanager.google.com/36504930#delivery/LineItemDetail/lineItemId=5086579843&orderId=2547802983
     - lineItemId=5086579843
@@ -19,7 +19,7 @@
 
 2. Devices
 
-    Menentukan device, jika diset auto, aplikasi akan menentukan sendiri devicenya sesuai aturan di bawah.
+    Menentukan device, jika diset **auto**, aplikasi akan menentukan device dengan aturan:
     - 970x90, 728x90, 300x600 : desktop
     - 320x100, 320x50: mobile
     - 300x250 : mobile & desktop
