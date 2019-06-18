@@ -11,10 +11,12 @@
 #### Panduan
 1. LineItemID
 
-  ID Line item Google Ad Manager, isian yang valid dapat dicek dibawah.
+    ID Line item Google Ad Manager, isian yang valid dapat dicek dibawah.
+
   - https://admanager.google.com/36504930#delivery/LineItemDetail/lineItemId=5086579843&orderId=2547802983
   - lineItemId=5086579843
   - 2547802983
+
 2. Devices
 
     Menentukan device, jika diset auto, aplikasi akan menentukan sendiri devicenya sesuai aturan di bawah.
@@ -22,11 +24,13 @@
     - 320x100, 320x50: mobile
     - 300x250 : mobile & desktop
     - Out-of-Page (1x1) : mobile & desktop
+
 3. Sites
 
     Menentukan situs, wajib di isi minimal satu.
 
 4. Settings
+
   - Parallel Tabs
 
       Jumlah tabs yang terbuka bersamaan dari Google Chrome yang terbuka di background. Semakin banyak nilainya akan semakin berat penggunaan RAM dan CPU.
