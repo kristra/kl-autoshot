@@ -46,15 +46,17 @@ module.exports = class Backend{
               previewObj.site = site;
     
               if(formObj.device === 'auto') {
-                previews.push({url : previewObj.url, filename : previewObj.filename + '_mobile', device : 'mobile', site: previewObj.site});
-                previews.push({url : previewObj.url, filename : previewObj.filename + '_desktop', device : 'desktop', site: previewObj.site});
+                if (val.size.match(/(320x50)|(320x100)/g)){
+                  previews.push({url : previewObj.url, filename : previewObj.filename + '_mobile', device : 'mobile', site: previewObj.site});
+                } else if(val.size.match(/(970x90)|(728x90)|(300x600)/g)){
+                  previews.push({url : previewObj.url, filename : previewObj.filename + '_desktop', device : 'desktop', site: previewObj.site});
+                } else {
+                  previews.push({url : previewObj.url, filename : previewObj.filename + '_mobile', device : 'mobile', site: previewObj.site});
+                  previews.push({url : previewObj.url, filename : previewObj.filename + '_desktop', device : 'desktop', site: previewObj.site});
+                }
               } else {
                 if(formObj.device === 'desktop' || formObj.device === 'mobile') {
                   previewObj.filename += ('_' + formObj.device);
-                } else if (val.size.match(/(320x50)|(320x100)/g)){
-                  previewObj.filename += '_mobile';
-                } else if(val.size.match(/(970x90)|(728x90)|(300x600)/g)){
-                  previewObj.filename += '_desktop';
                 }
                 previews.push(previewObj);
               }

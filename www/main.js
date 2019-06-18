@@ -3,10 +3,12 @@ const pepe = document.getElementById('pepe');
 const fail = document.getElementById('fail');
 const success = document.getElementById('success');
 
+class Frontend {};
+
 async function load(){
   initSites();
-  const backend = await carlo.loadParams();
-
+  const [backend] = await carlo.loadParams();
+  
   mainForm.onsubmit = async event => {
     event.preventDefault();
     pepe.style.display = 'block';

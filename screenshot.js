@@ -95,12 +95,14 @@ async function initBatch (previews, options, callback){
           if(err){
             failed.push(err); 
           } else {
-            if(gif.isGif === true) {
-              let listOfPNGs = fs.readdirSync(gif.tmpdir)
-                .map(a => a.substr(0, a.length - 4) + '')
-                .sort(function (a, b) { return a - b })
-                .map(a => gif.tmpdir + a.substr(0, a.length) + '.jpg');
-              addToGif(listOfPNGs, encoder, gif.tmpdir);
+            if(gif) {
+              if(gif.isGif) {
+                let listOfPNGs = fs.readdirSync(gif.tmpdir)
+                  .map(a => a.substr(0, a.length - 4) + '')
+                  .sort(function (a, b) { return a - b })
+                  .map(a => gif.tmpdir + a.substr(0, a.length) + '.jpg');
+                addToGif(listOfPNGs, encoder, gif.tmpdir);
+              }
             }
           }
         }));
