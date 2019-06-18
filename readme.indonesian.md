@@ -50,8 +50,8 @@
   
   - Screenshot yang gagal akan di tambilkan beserta pesan errornya.
 
+  > Jika pesan errornya seperti yang berikut, artinya materinya tidak ditemukan. Misalnya saat screenshot materi desktop, tapi device diset mobile.
+
    `error: No node found for selector: [data-google-query-id=""]`
 
-  > Jika pesan errornya seperti yang diatas, artinya materinya tidak ditemukan, misalnya SC desktop tapi devicenya diset mobile. 
-
-  > Pesan error hampir selalu muncul jika device diset *auto*
+  > Pesan error diatas hampir selalu muncul jika device diset **auto**
