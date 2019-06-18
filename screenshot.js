@@ -1,11 +1,11 @@
-const puppeteer = require('puppeteer-core');
 const findChrome = require('carlo/lib/find_chrome');
 const fs = require('fs');
 const GIFEncoder = require('gif-encoder');
 const getPixels = require('get-pixels');
+const puppeteer = require('puppeteer-core');
 const hrstart = process.hrtime();
-const workDir = './temp-gif/';
-const iPhone8SD = {
+const iPhone8SD = 
+    {
       'name': 'iPhone 8',
       'userAgent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
       'viewport': {
@@ -24,16 +24,24 @@ async function screenshot(page, preview, options, callback){
   } else if (preview.device === 'desktop' && !preview.url.match(/^https:\/\//g)) {
     preview.url = 'https://' + preview.url;
   }
-  console.log('Processing: ', preview.filename, preview.url);
+  console.log('Processing: ', preview.device , preview.site);
   try {
     await page.goto(preview.url, {waitUntil: 'networkidle0', timeout: options.timeout});
     await page.waitForSelector('[data-google-query-id]', {timeout: 500});
     await page.hover('[data-google-query-id=""]');
     await page.hover('[data-google-query-id=""]');
     if(options.ext === '.gif') {
-      await page.emulate(iPhone8SD);
-      const viewPort = await page.viewport();
-      const encoder = new GIFEncoder(viewPort.width, viewPort.height);
+      const queue = [];
+      const viewport = await page.viewport();
+      const encoder = new GIFEncoder(viewport.width, viewport.height);
+      const tmpdir = './temp-gif-'+preview.device+'-'+preview.site+'/';
+
+      fs.stat(tmpdir, (err, stat) => {
+        if(err){
+          fs.mkdir(tmpdir, err => {console.log(err)});
+        }
+        
+      });
       let file = fs.createWriteStream('screenshot/' + preview.filename + '.gif');
       encoder.setFrameRate(30);
       encoder.pipe(file);
@@ -41,82 +49,73 @@ async function screenshot(page, preview, options, callback){
       encoder.setDelay(500);
       encoder.writeHeader();
       encoder.setRepeat(0);
-      const queue = [];
-      fs.stat(workDir, (err, stat) => {
-        if(err){
-          fs.mkdir(workDir, err => {console.log(err)});
-        }
-      });
       for (let i = 0; i < 30; i++) {
-        queue.push(await page.screenshot({ path: workDir + i + ".jpg", quality: 75 }));
+        queue.push(await page.screenshot({ path: tmpdir + i + ".jpg", quality: 75 }));
         await page.waitFor(500);
       }
-      await Promise.all(queue).then(callback(true, encoder));
+      await Promise.all(queue).then(callback(null, {isGif:true, tmpdir:tmpdir}, encoder));
     } else {
       await page.screenshot({path: 'screenshot/' + preview.filename + options.ext});
       callback(null);
     }
-  } catch (error) {
-    // console.log(error.name, error.message);
-    if (error instanceof puppeteer.errors.TimeoutError) { 
+  } catch (err) {
+    console.log(err.name, err.message);
+    if (err instanceof puppeteer.errors.TimeoutError) { 
       await screenshot(page, preview, options, callback);
-    } else {
-      callback({preview : preview, error : error.message});
+    } else {  
+      callback({preview : preview, error : err.message});
     };
   }
 }
 
-async function initBatch (previews, options){
+async function initBatch (previews, options, callback){
   const pathToChrome = await findChrome({});
   const batchCount = Math.ceil(previews.length / options.parallel);
   const failed = [];
   let batch = 0;
   for(let i = 0; i < previews.length; i += parseInt(options.parallel)){
     batch++;
-    console.log('Processing ' + batch + ' of ' + batchCount);
-    const browser = await puppeteer.launch({executablePath: pathToChrome.executablePath, args: ['--disable-web-security','--allow-running-insecure-content'], userDataDir: './tmp'});
     const promises = [];
+    console.log('Processing batch ' + batch + ' of ' + batchCount);
+    const browser = await puppeteer.launch({
+      executablePath: pathToChrome.executablePath, 
+      args: ['--disable-web-security','--allow-running-insecure-content'], 
+      userDataDir: './tmp'}
+    );
     for(let j = 0; j < options.parallel; j++){
       const idx = i + j;
       if(previews[idx] != undefined){
         const page = await browser.newPage();
         if (previews[idx].device === 'desktop') {
           await page.setViewport({width: 1366, height: 650});
-          promises.push(screenshot(page, previews[idx], options, (preview, encoder)=>{
-            if(preview === true) {
-              let listOfPNGs = fs.readdirSync(workDir)
-                .map(a => a.substr(0, a.length - 4) + '')
-                .sort(function (a, b) { return a - b })
-                .map(a => workDir + a.substr(0, a.length) + '.png');
-              addToGif(listOfPNGs, encoder);
-            } else { failed.push(preview) }
-          }));
         } else {
           await page.emulate(iPhone8SD);
-          promises.push(screenshot(page, previews[idx], options, (preview, encoder)=>{
-            if(preview === true) {
-              let listOfPNGs = fs.readdirSync(workDir)
+        }
+        promises.push(screenshot(page, previews[idx], options, (err, gif, encoder)=>{
+          if(err){
+            failed.push(err); 
+          } else {
+            if(gif.isGif === true) {
+              let listOfPNGs = fs.readdirSync(gif.tmpdir)
                 .map(a => a.substr(0, a.length - 4) + '')
                 .sort(function (a, b) { return a - b })
-                .map(a => workDir + a.substr(0, a.length) + '.jpg');
-                console.log(listOfPNGs);
-              addToGif(listOfPNGs, encoder);
-            } else { failed.push(preview) }
-          }));
-        }
+                .map(a => gif.tmpdir + a.substr(0, a.length) + '.jpg');
+              addToGif(listOfPNGs, encoder, gif.tmpdir);
+            }
+          }
+        }));
       }
     }
     await Promise.all(promises);
     await browser.close();
     const hrend = process.hrtime(hrstart);
-    console.log('Execution time (hr): %ds', hrend[0]);    
+    console.log('Execution time (hr): %ds', hrend[0]);
   }
-  return failed;
+  await callback(null, failed);
 }
 
-function addToGif(images, encoder, counter = 0, ) {
+function addToGif(images, encoder, tmpdir,  counter = 0, ) {
   getPixels(images[counter], function (err, pixels) {
-    
     encoder.addFrame(pixels.data);
     encoder.read();
     if (counter === images.length - 1) {
@@ -125,19 +124,17 @@ function addToGif(images, encoder, counter = 0, ) {
         if (err) {
           console.log(err);
         } else {
-          // fs.rmdirSync(workDir);
-          console.log('Gif created!');
+          fs.rmdirSync(tmpdir);
         }
       });
     } else {
-      addToGif(images, encoder, ++counter);
+      addToGif(images, encoder, tmpdir, ++counter);
     }
   });
 };
 
 function cleanUp(listOfPNGs, callback) {
   let i = listOfPNGs.length;
-
   listOfPNGs.forEach(function (filepath) {
     fs.unlink(filepath, function (err) {
       i--;
@@ -150,6 +147,5 @@ function cleanUp(listOfPNGs, callback) {
     });
   });
 };
-
 
 module.exports = { initBatch, screenshot };

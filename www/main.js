@@ -3,49 +3,54 @@ const pepe = document.getElementById('pepe');
 const fail = document.getElementById('fail');
 const success = document.getElementById('success');
 
+class Frontend {};
+
 async function load(){
   initSites();
-  const [backend] = await carlo.loadParams();
-  
-  mainForm.onsubmit = async function(event){
-    {
-      event.preventDefault();
-      pepe.style.display = 'block';
-      mainForm.style.display = 'none';
-      let obj = {};
-      const sites = [];
-      document.querySelectorAll('input[type=text], input[type=number], input[type=radio]:checked').forEach(function(element){
-        if((element.name === 'lineItemId') && (element.value.search(/lineitemid=(\d{10})/gi) > -1)) {
-          console.log (element.value);
-          element.value = /\d{10}/g.exec(element.value.match(/lineitemid=(\d{10})/gi)[0]);
-        }
-        obj [element.name] = element.value;
-      });
-      document.querySelectorAll('input[type=checkbox]:checked').forEach(function(site){
-          sites.push(site.value);
-      });
-      obj['sites'] = sites;
-      for(let idx=0; idx < mainForm.elements.length; idx++){
-        mainForm.elements[idx].disabled = true;
+  const backend = await carlo.loadParams();
+
+  mainForm.onsubmit = async event => {
+    event.preventDefault();
+    pepe.style.display = 'block';
+    mainForm.style.display = 'none';
+    let obj = {};
+    const sites = [];
+    document.querySelectorAll('input[type=text], input[type=number], input[type=radio]:checked').forEach(input => {
+      if((input.name === 'lineItemId') && (input.value.search(/lineitemid=(\d{10})/gi) > -1)) {
+        input.value = /\d{10}/g.exec(input.value.match(/lineitemid=(\d{10})/gi)[0]);
       }
-      const report = await backend.batchScreenshot(JSON.stringify(obj));
-      if(report){
-        pepe.style.display = 'none';
-        success.style.display = 'block';
-        report.forEach(elem => {
+      obj[input.name] = input.value;
+    });
+    document.querySelectorAll('input[type=checkbox]:checked').forEach(site => {
+        sites.push(site.value);
+    });
+    obj['sites'] = sites;
+    for(let idx=0; idx < mainForm.elements.length; idx++){
+      mainForm.elements[idx].disabled = true;
+    }
+
+    await backend.batchScreenshot(JSON.stringify(obj))
+    .then(failedTask => {
+      console.log(failedTask);
+      pepe.style.display = 'none';
+      success.style.display = 'block';
+      if(failedTask){
+        failedTask.forEach(failedTask => {
           success.appendChild(htmlToElement(`
-            <p style='border-style: solid; border-width:1px 0 0 0;padding-top: 1em;'>filaname: ${elem.preview.filename}</p>
-            <p>device: ${elem.preview.device}</p>
-            <p>url: ${elem.preview.url}</p>
-            <p style='border-style: solid; border-width:0 0 1px 0;padding-bottom: 1em;'>error: ${elem.error}</p>
+            <p style='border-style: solid; border-width:1px 0 0 0;padding-top: 1em;'>filename: ${failedTask.preview.filename}</p>
+            <p>device: ${failedTask.preview.device}</p>
+            <p>url: ${failedTask.preview.url}</p>
+            <p style='border-style: solid; border-width:0 0 1px 0;padding-bottom: 1em;'>error: ${failedTask.error}</p>
           `));
-        });
-      } else {
-        pepe.style.display = 'none';
-        fail.style.display = 'block';
+        });  
       }
-    };
-  }
+    })
+    .catch( err => {
+      pepe.style.display = 'none';
+      fail.style.display = 'block';
+      fail.appendChild(document.createTextNode(err));
+    });
+  };
 }
 
 function check(){
