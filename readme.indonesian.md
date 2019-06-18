@@ -44,7 +44,7 @@
 
 ![alt text](https://cdn.betterttv.net/emote/59f27b3f4ebd8047f54dee29/3x "PepeHands")
 
-  - Jika proses screenshot berhasil dilakukan akan muncul "FeelsOkayMan".
+  - Jika proses screenshot selesai dilakukan akan muncul "FeelsOkayMan".
 
 ![alt text](https://cdn.betterttv.net/emote/5803757f3d506fea7ee35267/3x "FeelsOkayMan")
   
