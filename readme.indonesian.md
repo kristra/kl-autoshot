@@ -3,6 +3,7 @@
 #### Cara kerja
 - Aplikasi ini menjalankan chrome secara 'headless' atau tanpa interface di background.
 - Screenshot didapat dari semua creative yang berstatus aktif.
+- Waktu pengambilan screenshot cukup lama, untuk RON bisa lebih dari 10 menit.
 
 #### Kebutuhan
 - Google Chrome stable
