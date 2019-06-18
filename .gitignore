@@ -1,6 +1,8 @@
 node_modules
 package-lock.json
 dir
+tmp
+temp-gif
 screenshot
 *.jpg
 *.jpeg
