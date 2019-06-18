@@ -13,9 +13,9 @@
 
     ID Line item Google Ad Manager, isian yang valid dapat dicek dibawah.
 
-  - https://admanager.google.com/36504930#delivery/LineItemDetail/lineItemId=5086579843&orderId=2547802983
-  - lineItemId=5086579843
-  - 2547802983
+    - https://admanager.google.com/36504930#delivery/LineItemDetail/lineItemId=5086579843&orderId=2547802983
+    - lineItemId=5086579843
+    - 2547802983
 
 2. Devices
 
@@ -31,9 +31,9 @@
 
 4. Settings
 
-    - Parallel Tabs
+  - Parallel Tabs
 
-        Jumlah tabs yang terbuka bersamaan dari Google Chrome yang terbuka di background. Semakin banyak nilainya akan semakin berat penggunaan RAM dan CPU.
-    - Timeout (milliseconds)
+      Jumlah tabs yang terbuka bersamaan dari Google Chrome yang terbuka di background. Semakin banyak nilainya akan semakin berat penggunaan RAM dan CPU.
+  - Timeout (milliseconds)
 
-        Waktu tenggang untuk penelusuran web, jika iklan tidak muncul dalam waktu tenggang, aplikasi akan merefresh tab secara otomatis. Semakin banyak nilainya akan semakin lama proses pengambilan screenshot.
+      Waktu tenggang untuk penelusuran web, jika iklan tidak muncul dalam waktu tenggang, aplikasi akan merefresh tab secara otomatis. Semakin banyak nilainya akan semakin lama proses pengambilan screenshot.
